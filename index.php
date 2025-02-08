@@ -3,6 +3,9 @@
 
 header('Content-Type: application/json');
 
+// Define the shared secret that both the LSL script and PHP script know
+$SHARED_SECRET = 'gFs^ZHf%sE@%sz&9@mbc@&HLk&mHupeRL+ymGQrfRhHu$C4Fhd$r*AKXeu2cTj6q';
+
 // Check if the request method is GET
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
@@ -10,11 +13,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     exit;
 }
 
-// Validate and sanitize the inputs.
-// Using filter_input to retrieve and sanitize the 'message' and 'user' parameters.
-// FILTER_SANITIZE_SPECIAL_CHARS will escape HTML entities to prevent XSS attacks.
+// Retrieve and sanitize parameters from GET
 $messageParam = filter_input(INPUT_GET, 'message', FILTER_SANITIZE_SPECIAL_CHARS);
 $userParam    = filter_input(INPUT_GET, 'user', FILTER_SANITIZE_SPECIAL_CHARS);
+$secretParam  = filter_input(INPUT_GET, 'secret', FILTER_SANITIZE_SPECIAL_CHARS);
+
+// Check if the shared secret matches
+if (!$secretParam || $secretParam !== $SHARED_SECRET) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Unauthorized: invalid secret.']);
+    exit;
+}
 
 // Provide default values if parameters are missing or empty.
 if (!$messageParam || trim($messageParam) === '') {
@@ -24,17 +33,16 @@ if (!$userParam || trim($userParam) === '') {
     $userParam = 'Unknown';
 }
 
-// Optionally, you can log or further process $userParam if needed.
+// (Optional) You can log or process $userParam as needed.
 
 // MindStudio API endpoint and access token
 $mindstudio_url = 'https://api.mindstudio.ai/developer/v2/workers/run';
 $access_token   = 'sk3TecsoVGRyIi6mgyau2yCuAUoCAUecYuOUY6IyUKuiiKeMwkS2sK8qGwSY8u6ge2aEkC8c0suIMOIc8KwmCw6s';
 
-// Build the payload using the sanitized message
+// Build the payload using the sanitized message (optionally incorporate the user's name)
 $payload = [
     'workerId'  => '1166c068-68f8-4481-acb7-2fb3c82e21c6',
     'variables' => [
-        // Optionally prepend or incorporate the user's name into the message
         'message' => $messageParam
     ],
     'workflow'  => 'Main.flow'
