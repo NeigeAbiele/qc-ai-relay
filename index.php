@@ -3,6 +3,13 @@
 
 header('Content-Type: application/json');
 
+// Check if the request method is GET
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method Not Allowed. Only GET requests are accepted.']);
+    exit;
+}
+
 // Retrieve parameters from GET (you may also use $_POST if desired)
 $messageParam = isset($_GET['message']) ? $_GET['message'] : 'Summarize what happened to CX Synthe';
 $userParam    = isset($_GET['user']) ? $_GET['user'] : 'Unknown';
