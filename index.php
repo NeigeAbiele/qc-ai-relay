@@ -4,7 +4,7 @@
 header('Content-Type: application/json');
 
 // Define the shared secret that both the LSL script and PHP script know
-$SHARED_SECRET = 'gFs^ZHf%sE@%sz&9@mbc@&HLk&mHupeRL+ymGQrfRhHu$C4Fhd$r*AKXeu2cTj6q';
+$SHARED_SECRET = 'GPTYmQ2P3XQdadd4zHUEDgRFRnCTRwm5Tyg4CLCVIjC87pZbkcs62QpSrNIh87y3';
 
 // Check if the request method is GET
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
