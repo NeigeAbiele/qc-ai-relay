@@ -10,22 +10,31 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     exit;
 }
 
-// Retrieve parameters from GET (you may also use $_POST if desired)
-$messageParam = isset($_GET['message']) ? $_GET['message'] : 'Summarize what happened to CX Synthe';
-$userParam    = isset($_GET['user']) ? $_GET['user'] : 'Unknown';
+// Validate and sanitize the inputs.
+// Using filter_input to retrieve and sanitize the 'message' and 'user' parameters.
+// FILTER_SANITIZE_SPECIAL_CHARS will escape HTML entities to prevent XSS attacks.
+$messageParam = filter_input(INPUT_GET, 'message', FILTER_SANITIZE_SPECIAL_CHARS);
+$userParam    = filter_input(INPUT_GET, 'user', FILTER_SANITIZE_SPECIAL_CHARS);
 
-// (Optional) You can log or process $userParam as needed. For now, we simply use $messageParam.
+// Provide default values if parameters are missing or empty.
+if (!$messageParam || trim($messageParam) === '') {
+    $messageParam = 'Summarize what happened to CX Synthe';
+}
+if (!$userParam || trim($userParam) === '') {
+    $userParam = 'Unknown';
+}
+
+// Optionally, you can log or further process $userParam if needed.
 
 // MindStudio API endpoint and access token
 $mindstudio_url = 'https://api.mindstudio.ai/developer/v2/workers/run';
 $access_token   = 'sk3TecsoVGRyIi6mgyau2yCuAUoCAUecYuOUY6IyUKuiiKeMwkS2sK8qGwSY8u6ge2aEkC8c0suIMOIc8KwmCw6s';
 
-// Build the payload using the message from the request
+// Build the payload using the sanitized message
 $payload = [
     'workerId'  => '1166c068-68f8-4481-acb7-2fb3c82e21c6',
     'variables' => [
-        // Using the message passed from LSL; you might also prepend the user's name if desired:
-        // "[$userParam] $messageParam"
+        // Optionally prepend or incorporate the user's name into the message
         'message' => $messageParam
     ],
     'workflow'  => 'Main.flow'
